@@ -1,6 +1,6 @@
 name: eksperimen_credit_scoring
 
-conda_env: null
+conda_env: conda.yaml
 
 entry_points:
   main:

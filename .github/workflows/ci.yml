@@ -12,17 +12,24 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v3
         with:
+          auto-activate-base: true
           python-version: '3.9'
+          miniconda-version: latest
+          channels: conda-forge
+          channel-priority: true
 
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install pandas scikit-learn mlflow
-
-      - name: Menjalankan Script Pelatihan Model
+      - name: Create Conda Environment from conda.yaml
+        shell: bash -l {0}
         run: |
           cd MLProject
-          mlflow run . --no-conda
+          conda env create -f conda.yaml -n credit_scoring_env
+
+      - name: Menjalankan Script Pelatihan Model dengan MLflow
+        shell: bash -l {0}
+        run: |
+          conda activate credit_scoring_env
+          cd MLProject
+          mlflow run .
