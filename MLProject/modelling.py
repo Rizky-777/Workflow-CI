@@ -1,4 +1,5 @@
 import os
+import sys
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
@@ -6,7 +7,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 import mlflow
 import mlflow.sklearn
 
-def train_and_track():
+def train_and_track(experiment_name="Eksperimen_Credit_Scoring_Rizky"):
     print("⏳ Memuat data bersih untuk pelatihan...")
     
     # 1. Memuat data hasil preprocessing dari Kriteria 1
@@ -21,9 +22,8 @@ def train_and_track():
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     
     # 4. Set experiment name
-    mlflow.set_experiment("Eksperimen_Credit_Scoring_Rizky")
+    mlflow.set_experiment(experiment_name)
     
-    # 5. Tidak perlu mlflow.start_run() - MLflow run sudah jalan dari CLI
     print("🚀 Melatih model Random Forest Classifier...")
     
     # Menentukan parameter model
@@ -37,7 +37,7 @@ def train_and_track():
     # Prediksi hasil ke data uji
     y_pred = model.predict(X_test)
     
-    # 6. Menghitung Metrik Evaluasi
+    # 5. Menghitung Metrik Evaluasi
     acc = accuracy_score(y_test, y_pred)
     prec = precision_score(y_test, y_pred)
     rec = recall_score(y_test, y_pred)
@@ -49,7 +49,7 @@ def train_and_track():
     print(f"   - Recall   : {rec:.4f}")
     print(f"   - F1-Score : {f1:.4f}\n")
     
-    # 7. Mencatat Parameter dan Metrik ke MLflow
+    # 6. Mencatat Parameter dan Metrik ke MLflow
     mlflow.log_param("n_estimators", n_estimators)
     mlflow.log_param("random_state", random_state)
     
@@ -58,10 +58,11 @@ def train_and_track():
     mlflow.log_metric("recall", rec)
     mlflow.log_metric("f1_score", f1)
     
-    # 8. Menyimpan/Log model ke dalam MLflow
+    # 7. Menyimpan/Log model ke dalam MLflow
     mlflow.sklearn.log_model(model, "credit_scoring_model")
     
     print("✅ Model dan seluruh metrik sukses dicatat ke MLflow!")
 
 if __name__ == "__main__":
-    train_and_track()
+    experiment_name = sys.argv[1] if len(sys.argv) > 1 else "Eksperimen_Credit_Scoring_Rizky"
+    train_and_track(experiment_name)
