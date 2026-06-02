@@ -21,9 +21,8 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install pandas scikit-learn mlflow
-          
+
       - name: Menjalankan Script Pelatihan Model
         run: |
           cd MLProject
-          # Menambahkan flag --no-conda agar tidak mencari Conda sama sekali
           mlflow run . --no-conda
