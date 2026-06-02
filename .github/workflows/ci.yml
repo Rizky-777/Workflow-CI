@@ -20,11 +20,10 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          # Kita pastikan menginstall dari file atau langsung
           pip install pandas scikit-learn mlflow
           
       - name: Menjalankan Script Pelatihan Model
         run: |
           cd MLProject
-          # Menjalankan mlflow run
-          mlflow run .
+          # Menambahkan flag --no-conda agar tidak mencari Conda sama sekali
+          mlflow run . --no-conda
