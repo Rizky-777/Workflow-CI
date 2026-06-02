@@ -7,63 +7,48 @@ import mlflow
 import mlflow.sklearn
 
 def train_and_track():
-    print("⏳ Memuat data bersih untuk pelatihan...")
+    # 1. Pastikan MLflow aktif
+    if mlflow.active_run() is None:
+        mlflow.start_run()
+        
+    print("⏳ Memuat data...")
     
-    # 1. Memuat data hasil preprocessing dari Kriteria 1
-    data_path = 'dataset_preprocessing/data_preprocessed.csv'
-    df = pd.read_csv(data_path)
+    # 2. PATH yang benar (lokasi file CSV sekarang ada di dalam MLProject/dataset_preprocessing/)
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    data_path = os.path.join(script_dir, 'dataset_preprocessing', 'data_preprocessed.csv')
     
-    # 2. Memisahkan Fitur dan Target
+    # 3. Load Data
+    try:
+        df = pd.read_csv(data_path)
+        print(f"✅ Data dimuat sukses dari: {data_path}")
+    except Exception as e:
+        print(f"❌ Error saat memuat data: {e}")
+        return
+
+    # 4. Pelatihan Model
     X = df.drop('Creditworthiness', axis=1)
     y = df['Creditworthiness']
-    
-    # 3. Membagi data (80% Train, 20% Test)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     
-    # 4. Set experiment name
     mlflow.set_experiment("Eksperimen_Credit_Scoring_Rizky")
     
-    # JANGAN BUAT RUN BARU! mlflow run . sudah buat runnya
-    # Langsung log ke run yang sudah ada
-    print("🚀 Melatih model Random Forest Classifier...")
-    
-    # Menentukan parameter model
-    n_estimators = 100
-    random_state = 42
-    
-    # Inisialisasi dan pelatihan model
-    model = RandomForestClassifier(n_estimators=n_estimators, random_state=random_state)
+    model = RandomForestClassifier(n_estimators=100, random_state=42)
     model.fit(X_train, y_train)
     
-    # Prediksi hasil ke data uji
+    # 5. Evaluasi
     y_pred = model.predict(X_test)
-    
-    # 5. Menghitung Metrik Evaluasi
     acc = accuracy_score(y_test, y_pred)
-    prec = precision_score(y_test, y_pred)
-    rec = recall_score(y_test, y_pred)
     f1 = f1_score(y_test, y_pred)
     
-    print("\n📊 Hasil Evaluasi Model:")
-    print(f"   - Accuracy : {acc:.4f}")
-    print(f"   - Precision: {prec:.4f}")
-    print(f"   - Recall   : {rec:.4f}")
-    print(f"   - F1-Score : {f1:.4f}\n")
+    print(f"📊 Accuracy: {acc:.4f}, F1-Score: {f1:.4f}")
     
-    # 6. Mencatat Parameter dan Metrik ke MLflow
-    # Langsung log tanpa with statement
-    mlflow.log_param("n_estimators", n_estimators)
-    mlflow.log_param("random_state", random_state)
-    
+    # 6. Logging MLflow
     mlflow.log_metric("accuracy", acc)
-    mlflow.log_metric("precision", prec)
-    mlflow.log_metric("recall", rec)
     mlflow.log_metric("f1_score", f1)
-    
-    # 7. Menyimpan/Log model ke dalam MLflow
     mlflow.sklearn.log_model(model, "credit_scoring_model")
     
-    print("✅ Model dan seluruh metrik sukses dicatat ke MLflow!")
+    print("✅ Selesai! Model tercatat.")
+    mlflow.end_run()
 
 if __name__ == "__main__":
     train_and_track()
