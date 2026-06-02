@@ -1,0 +1,8 @@
+# Abaikan semua file
+*
+# Kecuali folder penting kita
+!/.github/
+!/.github/**
+!/MLProject/
+!/MLProject/**
+!.gitignore
