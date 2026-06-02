@@ -5,7 +5,3 @@ conda_env: conda.yaml
 entry_points:
   main:
     command: "python modelling.py"
-    parameters:
-      experiment_name:
-        type: string
-        default: "Eksperimen_Credit_Scoring_Rizky"

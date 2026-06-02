@@ -32,4 +32,4 @@ jobs:
         run: |
           conda activate credit_scoring_env
           cd MLProject
-          mlflow run .
+          mlflow run . --experiment-name "Eksperimen_Credit_Scoring_Rizky"
