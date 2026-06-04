@@ -32,22 +32,22 @@ def train_and_track():
     
     mlflow.set_experiment("Eksperimen_Credit_Scoring_Rizky")
     
+    # --- MENGAKTIFKAN AUTOLOG ---
+    mlflow.sklearn.autolog()
+    
     model = RandomForestClassifier(n_estimators=100, random_state=42)
     model.fit(X_train, y_train)
     
-    # 5. Evaluasi
+    # 5. Evaluasi (Hanya untuk ditampilkan di log terminal GitHub Actions)
     y_pred = model.predict(X_test)
     acc = accuracy_score(y_test, y_pred)
     f1 = f1_score(y_test, y_pred)
     
     print(f"📊 Accuracy: {acc:.4f}, F1-Score: {f1:.4f}")
     
-    # 6. Logging MLflow
-    mlflow.log_metric("accuracy", acc)
-    mlflow.log_metric("f1_score", f1)
-    mlflow.sklearn.log_model(model, "credit_scoring_model")
+    # 6. Logging MLflow Manual dihapus karena sudah diatasi oleh Autolog
     
-    print("✅ Selesai! Model tercatat.")
+    print("✅ Selesai! Model dan parameter otomatis tercatat.")
     mlflow.end_run()
 
 if __name__ == "__main__":
